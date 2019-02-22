@@ -1,2 +1,3 @@
-# ofw-kafka-confluent-go
-Kafka Confluent Go implementation for the Opinionated Kafka Framework
+# Opinionated Kafka Framework - Implementation with Confluent Framework
+
+Implements the OKF with confluent.
