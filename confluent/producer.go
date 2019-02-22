@@ -62,6 +62,7 @@ func NewKafkaProducer(topic string, clientID string) (*KafkaProducer, error) {
 //RateLimiter limites the producer to send only messages per second or wait
 type RateLimiter interface {
 	Check(now time.Time) time.Duration
+	IncrementMessageCount()
 }
 
 //SetRateLimiter sets the rate limiter to use
@@ -77,6 +78,7 @@ func (kp *KafkaProducer) Close() {
 //SendKeyValue send message with key and value
 func (kp *KafkaProducer) SendKeyValue(key []byte, value []byte) error {
 	if kp.RateLimiter != nil {
+		kp.RateLimiter.IncrementMessageCount()
 		idleTime := kp.RateLimiter.Check(time.Now())
 		if idleTime > 0 {
 			time.Sleep(idleTime)
