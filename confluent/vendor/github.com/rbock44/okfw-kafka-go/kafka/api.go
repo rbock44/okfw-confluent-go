@@ -40,6 +40,7 @@ type Registry interface {
 type MessageConsumer interface {
 	ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error
 	GetCounter() *int64
+	GetBacklog() (backlog int, err error)
 	Close()
 }
 

@@ -6,6 +6,7 @@ github.com/landoop/schema-registry v0.0.0-20181115093143-9861c67a815b/go.mod h1:
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rbock44/okfw-confluent-go v0.0.0-20190223074426-9da106846b4f h1:blcOVLnZ4kUVBto45X7X1qRYQmPwfjdnt+fX+EXeSZc=
 github.com/rbock44/okfw-confluent-go v0.0.0-20190223083339-f7fcaa35147f h1:r/EI3JiDMzJgTftM5duAJJ20OPrU444mae8nkn5A+uc=
+github.com/rbock44/okfw-confluent-go v0.0.0-20190223084521-1af3f784743f h1:JxwvKyO0faJG8V4z1AchpLOzKYrJcSeEeptYCKQf8OI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
