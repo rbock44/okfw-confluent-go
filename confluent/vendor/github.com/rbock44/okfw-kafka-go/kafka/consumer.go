@@ -143,6 +143,11 @@ func (c *BulkConsumer) Process() {
 	}
 }
 
+//GetBacklog returns the messages left in the topic
+func (c *BulkConsumer) GetBacklog() (int, error) {
+	return c.SimpleConsumer.GetBacklog()
+}
+
 //Close closes the bulk consumer and makes sure the underlying simple consumer is closed
 func (c *BulkConsumer) Close() {
 	if c.SimpleConsumer != nil {

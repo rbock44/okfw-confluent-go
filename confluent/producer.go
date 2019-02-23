@@ -98,9 +98,10 @@ func (kp *MessageProducer) SendKeyValue(key []byte, value []byte) error {
 			Value: value,
 		},
 		nil)
-	if err != nil {
-		kp.MessageCount++
+	if err == nil {
+		kp.SuccessCount++
 	}
+	kp.MessageCount++
 
 	return err
 
