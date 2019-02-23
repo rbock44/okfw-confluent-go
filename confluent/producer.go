@@ -69,8 +69,8 @@ func (kp *MessageProducer) SetRateLimiter(rateLimiter RateLimiter) {
 	kp.RateLimiter = rateLimiter
 }
 
-//Counter get the message counter
-func (kp *MessageProducer) Counter() *int64 {
+//GetCounter get the message counter
+func (kp *MessageProducer) GetCounter() *int64 {
 	return &kp.SuccessCount
 }
 

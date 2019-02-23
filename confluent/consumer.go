@@ -62,8 +62,8 @@ func (kc *MessageConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, value
 	}
 }
 
-//Counter get the message counter
-func (kc *MessageConsumer) Counter() *int64 {
+//GetCounter get the message counter
+func (kc *MessageConsumer) GetCounter() *int64 {
 	return &kc.DeliveredCount
 }
 
