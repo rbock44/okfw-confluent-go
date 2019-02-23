@@ -28,7 +28,7 @@ func NewRateReporter(name string, rateCounter RateCounter, shutdown *bool, logge
 		return nil, fmt.Errorf("logger should not be nil")
 	}
 
-	counter := rateCounter.GetCounter()
+	counter := rateCounter.GetRateCounter()
 	if counter == nil {
 		return nil, fmt.Errorf("rateCounter delivers nil counter")
 	}

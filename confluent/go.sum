@@ -33,6 +33,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223064328-e8441bb7e479 h1:+Wtw77Zbt2FYa9NhWphc6ujhTwLmbSihJhpk6X553Oc=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223064328-e8441bb7e479/go.mod h1:lBwHKJalRuJH6cuFd98uGHHD0zdYcYfDgvLBfrNR+VY=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-067d4b5 h1:bMFKe4KmSlcMf9x68jHlHXQA7vUb92Oniq4G9GKegow=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-067d4b5/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-6a3d712f2d0a h1:U/IFim1kTLyL50lHIXSusFamoqjYnB5gEbi25JM7k/8=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-6a3d712f2d0a/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

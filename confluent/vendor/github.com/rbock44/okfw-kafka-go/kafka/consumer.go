@@ -5,28 +5,28 @@ import (
 	"fmt"
 )
 
-//SimpleConsumer only supports ReadMessage
-type SimpleConsumer struct {
+//SingleConsumer only supports ReadMessage
+type SingleConsumer struct {
 	Consumer MessageConsumer
 	Registry Registry
 }
 
 //BulkConsumer supports bulk reads with message handlere and error handler
 type BulkConsumer struct {
-	SimpleConsumer *SimpleConsumer
+	SingleConsumer *SingleConsumer
 	MessageHandler func(key interface{}, value interface{}, err error)
 	Registry       Registry
 	PollTimeMs     int
 	Shutdown       *bool
 }
 
-//NewSimpleConsumer creates a SimpleConsumer
-func NewSimpleConsumer(topic string, clientID string, registry Registry) (*SimpleConsumer, error) {
+//NewSingleConsumer creates a SingleConsumer
+func NewSingleConsumer(topic string, clientID string, registry Registry) (*SingleConsumer, error) {
 	consumerImpl, err := fwFactory.NewConsumer(topic, clientID)
 	if err != nil {
 		return nil, err
 	}
-	sc := SimpleConsumer{
+	sc := SingleConsumer{
 		Consumer: consumerImpl,
 		Registry: registry,
 	}
@@ -45,13 +45,13 @@ func NewBulkConsumer(
 	if messageHandler == nil {
 		return nil, fmt.Errorf("messageHandler is nil")
 	}
-	simpleConsumer, err := NewSimpleConsumer(topic, clientID, registry)
+	SingleConsumer, err := NewSingleConsumer(topic, clientID, registry)
 	if err != nil {
 		return nil, err
 	}
 	bulkConsumer := BulkConsumer{
 		MessageHandler: messageHandler,
-		SimpleConsumer: simpleConsumer,
+		SingleConsumer: SingleConsumer,
 		PollTimeMs:     pollTimeMs,
 		Shutdown:       shutdown,
 	}
@@ -60,7 +60,7 @@ func NewBulkConsumer(
 }
 
 //ReadMessage read a message and process it
-func (c *SimpleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{}, interface{}, error) {
+func (c *SingleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{}, interface{}, error) {
 	keyBuffer := &bytes.Buffer{}
 	valueBuffer := &bytes.Buffer{}
 	err := c.Consumer.ReadMessage(shutdownCheckInterfaceMs, keyBuffer, valueBuffer)
@@ -110,25 +110,25 @@ func (c *SimpleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{},
 	return key, value, err
 }
 
-//GetCounter returns the message counter address to monitor e.g. with the rate limiter
-func (c *SimpleConsumer) GetCounter() *int64 {
-	return c.Consumer.GetCounter()
+//GetRateCounter returns the message counter address to monitor e.g. with the rate limiter
+func (c *SingleConsumer) GetRateCounter() *int64 {
+	return c.Consumer.GetRateCounter()
 }
 
 //GetBacklog returns the messages left in the topic
-func (c *SimpleConsumer) GetBacklog() (int, error) {
-	return c.Consumer.GetBacklog()
+func (c *SingleConsumer) GetBacklog() (int, error) {
+	return c.GetBacklog()
 }
 
 //Close closes the underlying consumer implementation
-func (c *SimpleConsumer) Close() {
+func (c *SingleConsumer) Close() {
 	c.Consumer.Close()
 }
 
 //Process receive messages and dispatch to message handler and error handler until shutdown flag is true
 func (c *BulkConsumer) Process() {
 	for {
-		key, value, err := c.SimpleConsumer.ReadMessage(c.PollTimeMs)
+		key, value, err := c.SingleConsumer.ReadMessage(c.PollTimeMs)
 		if err != nil {
 			c.MessageHandler(key, value, err)
 		} else {
@@ -145,12 +145,12 @@ func (c *BulkConsumer) Process() {
 
 //GetBacklog returns the messages left in the topic
 func (c *BulkConsumer) GetBacklog() (int, error) {
-	return c.SimpleConsumer.GetBacklog()
+	return c.SingleConsumer.GetBacklog()
 }
 
 //Close closes the bulk consumer and makes sure the underlying simple consumer is closed
 func (c *BulkConsumer) Close() {
-	if c.SimpleConsumer != nil {
-		c.SimpleConsumer.Close()
+	if c.SingleConsumer != nil {
+		c.SingleConsumer.Close()
 	}
 }

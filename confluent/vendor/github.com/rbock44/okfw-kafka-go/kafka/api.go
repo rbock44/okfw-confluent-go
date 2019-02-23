@@ -39,7 +39,7 @@ type Registry interface {
 //MessageConsumer interface to abstract message receiving and make writing tests simpler
 type MessageConsumer interface {
 	ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error
-	GetCounter() *int64
+	GetRateCounter() *int64
 	GetBacklog() (backlog int, err error)
 	Close()
 }
@@ -47,7 +47,7 @@ type MessageConsumer interface {
 //MessageProducer interface to abstract message sending and make writing tests simpler
 type MessageProducer interface {
 	SendKeyValue(key []byte, value []byte) error
-	GetCounter() *int64
+	GetRateCounter() *int64
 	Close()
 }
 
@@ -58,7 +58,7 @@ type BacklogRetriever interface {
 
 //RateCounter delivers the pointer to monitor the count
 type RateCounter interface {
-	GetCounter() *int64
+	GetRateCounter() *int64
 }
 
 //Provider creates kafa consumer producer based on an implementation

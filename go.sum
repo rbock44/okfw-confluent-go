@@ -8,6 +8,9 @@ github.com/rbock44/okfw-confluent-go v0.0.0-20190223074426-9da106846b4f h1:blcOV
 github.com/rbock44/okfw-confluent-go v0.0.0-20190223083339-f7fcaa35147f h1:r/EI3JiDMzJgTftM5duAJJ20OPrU444mae8nkn5A+uc=
 github.com/rbock44/okfw-confluent-go v0.0.0-20190223084521-1af3f784743f h1:JxwvKyO0faJG8V4z1AchpLOzKYrJcSeEeptYCKQf8OI=
 github.com/rbock44/okfw-confluent-go v0.0.0-20190223085808-35be1de463a0 h1:pPvsAu54BX4/SwZN+k3P8I6EhR7wjyzdsyGj881h/64=
+github.com/rbock44/okfw-confluent-go v0.0.0-20190223092515-6b656ae0e052 h1:eGNOcEHuscTu+L+uwJWmZBUzJlS3zbZ8+zBnqV+6FQc=
+github.com/rbock44/okfw-kafka-go v0.0.0-20190223094711-067d4b566627 h1:TxGdU6aGUkJzNdsTWGlo2eP3mB4xdBmUmWpJ6s4MgiE=
+github.com/rbock44/okfw-kafka-go v0.0.0-20190223094711-067d4b566627/go.mod h1:Dm0K0Fvm86xX8/TaAaohyfV9Mg5iRZgmy6hAaIxm88Q=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
