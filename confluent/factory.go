@@ -1,6 +1,8 @@
 package confluent
 
 import (
+	"fmt"
+
 	"github.com/rbock44/okfw-kafka-go/kafka"
 )
 
@@ -18,8 +20,12 @@ func (p *FrameworkFactory) NewProducer(topic string, clientID string) (kafka.Mes
 }
 
 //NewRegistry creates a new registry
-func (p *FrameworkFactory) NewRegistry() kafka.Registry {
-	return kafka.NewKafkaRegistry(newSchemaResolver())
+func (p *FrameworkFactory) NewRegistry() (kafka.Registry, error) {
+	_, err := getKafkaSchemaClient().Subjects()
+	if err != nil {
+		return nil, fmt.Errorf("cannot query subjects on kafka registry [%s]", err.Error())
+	}
+	return kafka.NewKafkaRegistry(newSchemaResolver()), nil
 }
 
 //NewFrameworkFactory creates the consumer and provider factory
