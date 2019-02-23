@@ -49,7 +49,7 @@ type MessageConsumer interface {
 //MessageProducer interface to abstract message sending and make writing tests simpler
 type MessageProducer interface {
 	SendKeyValue(key []byte, value []byte) error
-	GetRateCounter() *int64
+	GetMessageCounter() *int64
 	Close()
 }
 
@@ -58,9 +58,9 @@ type BacklogRetriever interface {
 	GetBacklog() (backlog int, err error)
 }
 
-//RateCounter delivers the pointer to monitor the count
-type RateCounter interface {
-	GetRateCounter() *int64
+//DeliveredCounter delivers the address of the delivered messages (send or received)
+type DeliveredCounter interface {
+	GetDeliveredCounter() *int64
 }
 
 //Provider creates kafa consumer producer based on an implementation

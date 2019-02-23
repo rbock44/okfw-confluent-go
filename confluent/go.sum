@@ -23,8 +23,12 @@ github.com/rbock44/okfw-kafka-go v0.0.0-20190223171756-c94b32241609/go.mod h1:Dm
 github.com/rbock44/okfw-kafka-go v0.0.0-20190223172320-0899df752728/go.mod h1:Dm0K0Fvm86xX8/TaAaohyfV9Mg5iRZgmy6hAaIxm88Q=
 github.com/rbock44/okfw-kafka-go v0.0.0-20190223180449-7733a1bf167f h1:n4lhqCCI3mA1jKFte5gD+26bRHW6SsklHqsso/t7CPY=
 github.com/rbock44/okfw-kafka-go v0.0.0-20190223180449-7733a1bf167f/go.mod h1:Dm0K0Fvm86xX8/TaAaohyfV9Mg5iRZgmy6hAaIxm88Q=
+github.com/rbock44/okfw-kafka-go v0.0.0-20190223182900-e0c8a98e465c h1:FSTOkTFrl4lnk13M19pVwRZLKsIXnD2ziPoFgv865Hg=
+github.com/rbock44/okfw-kafka-go v0.0.0-20190223182900-e0c8a98e465c/go.mod h1:Dm0K0Fvm86xX8/TaAaohyfV9Mg5iRZgmy6hAaIxm88Q=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223180449-7733a1bf167f h1:QE2lkDetYlkvwx+TicBRhCRaoEYwJO7eYMNv0y4aVoo=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223180449-7733a1bf167f/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223182900-e0c8a98e465c h1:8FOZUOJP5GJR1ffhN6eQ6fsmmKWCAPm3p0013KIGVFw=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223182900-e0c8a98e465c/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

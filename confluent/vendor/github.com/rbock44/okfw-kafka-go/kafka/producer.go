@@ -8,11 +8,12 @@ import (
 
 //SingleProducer combines a kafka producer with avro schema support
 type SingleProducer struct {
-	Topic       string
-	Registry    Registry
-	Producer    MessageProducer
-	RateLimiter *RateLimiter
-	Shutdown    bool
+	Topic        string
+	Registry     Registry
+	Producer     MessageProducer
+	rateLimiter  *RateLimiter
+	Shutdown     bool
+	MessageCount int64
 }
 
 //NewSingleProducer creates a SingleProducer
@@ -33,7 +34,7 @@ func NewSingleProducer(topic string, clientID string, registry Registry) (*Singl
 
 //SetRateLimit limits the message send to limit per second
 func (p *SingleProducer) SetRateLimit(limitPerSecond int) {
-	p.RateLimiter = &RateLimiter{
+	p.rateLimiter = &RateLimiter{
 		StartTime:      time.Now(),
 		LimitPerSecond: int64(limitPerSecond),
 	}
@@ -51,6 +52,10 @@ func (p *SingleProducer) SendKeyValue(keySchema MessageSchema, key interface{}, 
 	if err != nil {
 		return err
 	}
+	p.MessageCount++
+	if p.rateLimiter != nil {
+		p.rateLimiter.Check(time.Now(), *p.Producer.GetMessageCounter())
+	}
 	return nil
 }
 
@@ -58,7 +63,7 @@ func (p *SingleProducer) SendKeyValue(keySchema MessageSchema, key interface{}, 
 func (p *SingleProducer) RunRateReporter(intervalMs int) {
 	prr, err := NewRateReporter(
 		p.Topic,
-		p.GetRateCounter(),
+		p.Producer.GetMessageCounter(),
 		&p.Shutdown,
 		func(name string, rate float64) {
 			fmt.Printf("report rate [%s] [%4.2f]\n", p.Topic, rate)
@@ -67,11 +72,6 @@ func (p *SingleProducer) RunRateReporter(intervalMs int) {
 	if err == nil {
 		go prr.Run()
 	}
-}
-
-//GetRateCounter returns the message counter address to monitor e.g. with the rate limiter
-func (p *SingleProducer) GetRateCounter() *int64 {
-	return p.Producer.GetRateCounter()
 }
 
 //Close closes the underlying consumer implementation
