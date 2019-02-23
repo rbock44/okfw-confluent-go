@@ -114,7 +114,7 @@ func (c *SingleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{},
 	return key, value, err
 }
 
-//RunBacklogReporter runs the go routine for the backlog reporter
+//RunBacklogReporter runs the back log reporter should be run in a go routine
 func (c *SingleConsumer) RunBacklogReporter(intervalMs int) {
 	br, err := NewBacklogReporter(
 		c.Topic,
@@ -129,14 +129,14 @@ func (c *SingleConsumer) RunBacklogReporter(intervalMs int) {
 	}
 }
 
-//RunRateReporter starts a go routine with the rate reporter
+//RunRateReporter starts rate reporter should be run in a go routine
 func (c *SingleConsumer) RunRateReporter(intervalMs int) {
 	br, err := NewRateReporter(
 		c.Topic,
-		c.Consumer.GetRateCounter(),
+		c.Consumer.GetMessageCounter(),
 		&c.Shutdown,
 		func(name string, rate float64) {
-			fmt.Printf("report rate [%s] [%4.2f]", name, rate)
+			fmt.Printf("report rate [%s] [%4.2f]\n", name, rate)
 		},
 		intervalMs)
 	if err == nil {
@@ -146,12 +146,12 @@ func (c *SingleConsumer) RunRateReporter(intervalMs int) {
 
 //GetRateCounter returns the message counter address to monitor e.g. with the rate limiter
 func (c *SingleConsumer) GetRateCounter() *int64 {
-	return c.Consumer.GetRateCounter()
+	return c.Consumer.GetMessageCounter()
 }
 
 //GetBacklog returns the messages left in the topic
 func (c *SingleConsumer) GetBacklog() (int, error) {
-	return c.GetBacklog()
+	return c.Consumer.GetBacklog()
 }
 
 //Close closes the underlying consumer implementation

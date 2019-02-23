@@ -17,6 +17,11 @@ func (p *FrameworkFactory) NewProducer(topic string, clientID string) (kafka.Mes
 	return newMessageProducer(topic, clientID)
 }
 
+//NewRegistry creates a new registry
+func (p *FrameworkFactory) NewRegistry() kafka.Registry {
+	return kafka.NewKafkaRegistry(newSchemaResolver())
+}
+
 //NewFrameworkFactory creates the consumer and provider factory
 func NewFrameworkFactory() *FrameworkFactory {
 	return &FrameworkFactory{}

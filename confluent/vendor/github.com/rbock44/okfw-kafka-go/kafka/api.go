@@ -41,7 +41,7 @@ type Registry interface {
 //MessageConsumer interface to abstract message receiving and make writing tests simpler
 type MessageConsumer interface {
 	ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error
-	GetRateCounter() *int64
+	GetMessageCounter() *int64
 	GetBacklog() (backlog int, err error)
 	Close()
 }
@@ -49,7 +49,6 @@ type MessageConsumer interface {
 //MessageProducer interface to abstract message sending and make writing tests simpler
 type MessageProducer interface {
 	SendKeyValue(key []byte, value []byte) error
-	GetMessageCounter() *int64
 	Close()
 }
 
