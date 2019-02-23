@@ -7,8 +7,8 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-//ConfluentConsumer high level consumer wrapper
-type ConfluentConsumer struct {
+//MessageConsumer high level consumer wrapper
+type MessageConsumer struct {
 	Topic          string
 	ClientID       string
 	Consumer       *kafka.Consumer
@@ -17,9 +17,8 @@ type ConfluentConsumer struct {
 	DeliveredCount int64
 }
 
-//NewConfluentConsumer create a kafka consumer wrapper
-func NewConfluentConsumer(topic string, clientID string) (*ConfluentConsumer, error) {
-	kc := ConfluentConsumer{Topic: topic, ClientID: clientID}
+func newMessageConsumer(topic string, clientID string) (*MessageConsumer, error) {
+	kc := MessageConsumer{Topic: topic, ClientID: clientID}
 
 	var err error
 	kc.Consumer, err = kafka.NewConsumer(
@@ -42,7 +41,7 @@ func NewConfluentConsumer(topic string, clientID string) (*ConfluentConsumer, er
 }
 
 //ReadMessage read an event in case no event is available return nil
-func (kc *ConfluentConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error {
+func (kc *MessageConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error {
 	ev := kc.Consumer.Poll(timeoutMs)
 	switch e := ev.(type) {
 	case *kafka.Message:
@@ -64,6 +63,6 @@ func (kc *ConfluentConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, val
 }
 
 //Close close the consumer
-func (kc *ConfluentConsumer) Close() {
+func (kc *MessageConsumer) Close() {
 	kc.Consumer.Close()
 }

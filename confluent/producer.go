@@ -7,8 +7,8 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
-//ConfluentProducer holds the kafka producer and some message counters
-type ConfluentProducer struct {
+//MessageProducer holds the kafka producer and some message counters
+type MessageProducer struct {
 	SuccessCount int64
 	FailedCount  int64
 	MessageCount int64
@@ -18,9 +18,8 @@ type ConfluentProducer struct {
 	RateLimiter  RateLimiter
 }
 
-//NewConfluentProducer creates a new producer
-func NewConfluentProducer(topic string, clientID string) (*ConfluentProducer, error) {
-	kp := &ConfluentProducer{
+func newMessageProducer(topic string, clientID string) (*MessageProducer, error) {
+	kp := &MessageProducer{
 		Topic:    topic,
 		ClientID: clientID,
 	}
@@ -66,17 +65,17 @@ type RateLimiter interface {
 }
 
 //SetRateLimiter sets the rate limiter to use
-func (kp *ConfluentProducer) SetRateLimiter(rateLimiter RateLimiter) {
+func (kp *MessageProducer) SetRateLimiter(rateLimiter RateLimiter) {
 	kp.RateLimiter = rateLimiter
 }
 
 //Close the producer
-func (kp *ConfluentProducer) Close() {
+func (kp *MessageProducer) Close() {
 	kp.Producer.Close()
 }
 
 //SendKeyValue send message with key and value
-func (kp *ConfluentProducer) SendKeyValue(key []byte, value []byte) error {
+func (kp *MessageProducer) SendKeyValue(key []byte, value []byte) error {
 	if kp.RateLimiter != nil {
 		kp.RateLimiter.IncrementMessageCount()
 		idleTime := kp.RateLimiter.Check(time.Now())
@@ -103,7 +102,7 @@ func (kp *ConfluentProducer) SendKeyValue(key []byte, value []byte) error {
 }
 
 //WaitUntilSendComplete wait until all messages are sent
-func (kp *ConfluentProducer) WaitUntilSendComplete() {
+func (kp *MessageProducer) WaitUntilSendComplete() {
 	for kp.MessageCount > 0 {
 		time.Sleep(time.Second * 1)
 	}
