@@ -62,6 +62,11 @@ func (kc *MessageConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, value
 	}
 }
 
+//Counter get the message counter
+func (kc *MessageConsumer) Counter() *int64 {
+	return &kc.DeliveredCount
+}
+
 //Close close the consumer
 func (kc *MessageConsumer) Close() {
 	kc.Consumer.Close()

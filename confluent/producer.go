@@ -69,6 +69,11 @@ func (kp *MessageProducer) SetRateLimiter(rateLimiter RateLimiter) {
 	kp.RateLimiter = rateLimiter
 }
 
+//Counter get the message counter
+func (kp *MessageProducer) Counter() *int64 {
+	return &kp.SuccessCount
+}
+
 //Close the producer
 func (kp *MessageProducer) Close() {
 	kp.Producer.Close()
