@@ -25,7 +25,7 @@ func (p *FrameworkFactory) NewRegistry() (kafka.Registry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot query subjects on kafka registry [%s]", err.Error())
 	}
-	return kafka.NewKafkaRegistry(newSchemaResolver()), nil
+	return kafka.NewSchemaRegistry(), nil
 }
 
 //NewFrameworkFactory creates the consumer and provider factory

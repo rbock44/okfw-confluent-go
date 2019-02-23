@@ -5,6 +5,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/mock v1.2.0
 	github.com/landoop/schema-registry v0.0.0-20181115093143-9861c67a815b
-	github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223205148-7bf6b83f2071
+	github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223211504-fa53c6217ec5
 	github.com/stretchr/objx v0.1.1 // indirect
 )

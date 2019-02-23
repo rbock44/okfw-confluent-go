@@ -37,6 +37,8 @@ github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223204808-d10e176f905d h1:m3+
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223204808-d10e176f905d/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223205148-7bf6b83f2071 h1:42fd2PK4cAG5teXrxHcXDxoVH4iPtukcwlBulwDFKm4=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223205148-7bf6b83f2071/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223211504-fa53c6217ec5 h1:slGqTJtnepd+ood0/tb9sbfJ81qXGT0XJw5MaqSR+TQ=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223211504-fa53c6217ec5/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

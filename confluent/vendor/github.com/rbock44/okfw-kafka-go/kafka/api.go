@@ -66,4 +66,5 @@ type DeliveredCounter interface {
 type Provider interface {
 	NewConsumer(topic string, clientID string) (MessageConsumer, error)
 	NewProducer(topic string, clientID string) (MessageProducer, error)
+	NewSchemaResolver() SchemaResolver
 }

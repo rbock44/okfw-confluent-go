@@ -6,8 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"time"
-
-	schemaregistry "github.com/landoop/schema-registry"
 )
 
 //AvroSchema handles schema lookup and codec
@@ -48,24 +46,25 @@ type SchemaResolver interface {
 	RegisterNewSchema(subject string, content string) (id int, err error)
 }
 
-//KafkaRegistry contains all registered schema
-type KafkaRegistry struct {
+//SchemaRegistry contains all registered schema
+type SchemaRegistry struct {
 	SchemasByID   map[int]*AvroSchema
 	SchemasByName map[string]*AvroSchema
 	Resolver      SchemaResolver
 }
 
-//NewKafkaRegistry creates a kafka schema registry
-func NewKafkaRegistry(resolver SchemaResolver) *KafkaRegistry {
-	return &KafkaRegistry{
-		Resolver:      resolver,
+//NewSchemaRegistry creates a kafka schema registry
+func NewSchemaRegistry() *SchemaRegistry {
+	schemaResolver := fwFactory.NewSchemaResolver()
+	return &SchemaRegistry{
+		Resolver:      schemaResolver,
 		SchemasByID:   map[int]*AvroSchema{},
 		SchemasByName: map[string]*AvroSchema{},
 	}
 }
 
 //Lookup lookup schema in kafka cluster
-func (s KafkaRegistry) Lookup(subject string, version int) (*AvroSchema, error) {
+func (s SchemaRegistry) Lookup(subject string, version int) (*AvroSchema, error) {
 	schemaID, err := s.Resolver.GetSchemaBySubject(subject, version)
 	if err != nil {
 		return nil, fmt.Errorf(fmt.Sprintf("schema registry lookup error [%#v]\n", err))
@@ -82,7 +81,7 @@ func (s KafkaRegistry) Lookup(subject string, version int) (*AvroSchema, error) 
 }
 
 //GetSchemaByID gets the schema by id
-func (s KafkaRegistry) GetSchemaByID(id int) (MessageSchema, error) {
+func (s SchemaRegistry) GetSchemaByID(id int) (MessageSchema, error) {
 	ms := s.SchemasByID[id]
 	if ms == nil {
 		return nil, fmt.Errorf("schema id not found [%d]", id)
@@ -91,7 +90,7 @@ func (s KafkaRegistry) GetSchemaByID(id int) (MessageSchema, error) {
 }
 
 //GetSchemaByName gets the schema by name
-func (s KafkaRegistry) GetSchemaByName(name string) (MessageSchema, error) {
+func (s SchemaRegistry) GetSchemaByName(name string) (MessageSchema, error) {
 	ms := s.SchemasByName[name]
 	if ms == nil {
 		return nil, fmt.Errorf("schema subject not found [%s]", name)
@@ -100,7 +99,7 @@ func (s KafkaRegistry) GetSchemaByName(name string) (MessageSchema, error) {
 }
 
 //Register schema with registry
-func (s KafkaRegistry) Register(subject string, version int, schemaPath string, decoder Decoder, encoder Encoder) (MessageSchema, error) {
+func (s SchemaRegistry) Register(subject string, version int, schemaPath string, decoder Decoder, encoder Encoder) (MessageSchema, error) {
 	retryCount := 5
 	retryTimeMs := 1000
 	schemaContent, err := ioutil.ReadFile(schemaPath)
@@ -128,40 +127,4 @@ func (s KafkaRegistry) Register(subject string, version int, schemaPath string, 
 	s.SchemasByID[id] = localSchema
 	s.SchemasByName[subject] = localSchema
 	return localSchema, nil
-}
-
-type schemaClientType struct{}
-
-//NewKafkaSchemaResolver creates a schema resolver calling the Kafka Cluster
-func NewKafkaSchemaResolver() SchemaResolver {
-	return &schemaClientType{}
-}
-
-func (c *schemaClientType) GetSchemaBySubject(subject string, version int) (schemaID int, err error) {
-	schema, err := getKafkaSchemaClient().GetSchemaBySubject(subject, version)
-	if err != nil {
-		return 0, err
-	}
-	return schema.ID, nil
-}
-
-func (c *schemaClientType) RegisterNewSchema(subject string, content string) (schemaID int, err error) {
-	id, err := getKafkaSchemaClient().RegisterNewSchema(subject, content)
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
-var schemaClient *schemaregistry.Client
-
-func getKafkaSchemaClient() *schemaregistry.Client {
-	var err error
-	if schemaClient == nil {
-		schemaClient, err = schemaregistry.NewClient(schemaregistry.DefaultUrl)
-		if err != nil {
-			panic(fmt.Sprintf("schema registry client creation error [%v]\n", err))
-		}
-	}
-	return schemaClient
 }
