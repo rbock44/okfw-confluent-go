@@ -3,7 +3,7 @@ package confluent
 import "github.com/confluentinc/confluent-kafka-go/kafka"
 
 //GetBacklog returns the messages left in the partition
-func (kc *KafkaConsumer) GetBacklog() (int, error) {
+func (kc *ConfluentConsumer) GetBacklog() (int, error) {
 	var n int
 
 	// Get the current assigned partitions.
