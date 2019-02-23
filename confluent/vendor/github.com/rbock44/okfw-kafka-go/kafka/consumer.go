@@ -115,6 +115,11 @@ func (c *SimpleConsumer) GetCounter() *int64 {
 	return c.Consumer.GetCounter()
 }
 
+//GetBacklog returns the messages left in the topic
+func (c *SimpleConsumer) GetBacklog() (int, error) {
+	return c.Consumer.GetBacklog()
+}
+
 //Close closes the underlying consumer implementation
 func (c *SimpleConsumer) Close() {
 	c.Consumer.Close()
