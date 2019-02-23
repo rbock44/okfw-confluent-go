@@ -10,15 +10,15 @@ type RateReporter struct {
 	Name               string
 	Counter            *int64
 	Shutdown           *bool
-	Logger             func(name string, rate float64, shutdown bool)
+	Logger             func(name string, rate float64)
 	RatePeriod         time.Duration
 	PerSecondMultipler float64
 }
 
 //NewRateReporter create a RateReporter
-func NewRateReporter(name string, rateCounter RateCounter, shutdown *bool, logger func(name string, rate float64, shutdown bool), ratePeriodMs int) (*RateReporter, error) {
-	if rateCounter == nil {
-		return nil, fmt.Errorf("rateCounter should not be nil")
+func NewRateReporter(name string, counter *int64, shutdown *bool, logger func(name string, rate float64), ratePeriodMs int) (*RateReporter, error) {
+	if counter == nil {
+		return nil, fmt.Errorf("counter should not be nil")
 	}
 	if shutdown == nil {
 		return nil, fmt.Errorf("shutdown should not be nil")
@@ -26,11 +26,6 @@ func NewRateReporter(name string, rateCounter RateCounter, shutdown *bool, logge
 
 	if logger == nil {
 		return nil, fmt.Errorf("logger should not be nil")
-	}
-
-	counter := rateCounter.GetRateCounter()
-	if counter == nil {
-		return nil, fmt.Errorf("rateCounter delivers nil counter")
 	}
 
 	return &RateReporter{
@@ -50,7 +45,7 @@ func (r *RateReporter) Run() {
 		currentCount := *r.Counter
 		rate := r.calculateRatePerSecond(currentCount, lastCount)
 		lastCount = currentCount
-		r.Logger(r.Name, rate, *r.Shutdown)
+		r.Logger(r.Name, rate)
 		if *r.Shutdown {
 			break
 		}
@@ -63,8 +58,8 @@ func (r *RateReporter) calculateRatePerSecond(currentCount int64, lastCount int6
 
 //RateLimiter restricts the rate to max messages per second
 type RateLimiter struct {
+	LastResetCount int64
 	StartTime      time.Time
-	MessageCount   int64
 	LimitPerSecond int64
 }
 
@@ -76,23 +71,19 @@ func NewRateLimiter(limitPerSecond int) *RateLimiter {
 	}
 }
 
-//IncrementMessageCount increments the message count
-func (r *RateLimiter) IncrementMessageCount() {
-	r.MessageCount++
-}
-
 // Check does
 // - check the rate limit
 // - return the time it needs to idle in case message count is reached
-func (r *RateLimiter) Check(checkTime time.Time) time.Duration {
+func (r *RateLimiter) Check(checkTime time.Time, messageCount int64) time.Duration {
 	elapsedTime := checkTime.Sub(r.StartTime)
 	if elapsedTime > time.Second {
 		//reset as second is over
-		r.MessageCount = 0
+		r.LastResetCount = messageCount
 		r.StartTime = checkTime
 		return 0
 	}
-	if r.MessageCount <= r.LimitPerSecond {
+	messageDiff := messageCount - r.LastResetCount
+	if messageDiff <= r.LimitPerSecond {
 		if elapsedTime < time.Second {
 			return 0
 		}
@@ -104,7 +95,7 @@ func (r *RateLimiter) Check(checkTime time.Time) time.Duration {
 		return remainingTime
 	}
 	//reset as we second is over
-	r.MessageCount = 0
+	r.LastResetCount = 0
 	r.StartTime = checkTime
 
 	return 0

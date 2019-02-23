@@ -1,6 +1,8 @@
 package kafka
 
-import "io"
+import (
+	"io"
+)
 
 var fwFactory Provider
 

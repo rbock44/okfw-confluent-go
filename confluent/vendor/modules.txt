@@ -4,5 +4,5 @@ github.com/confluentinc/confluent-kafka-go/kafka
 github.com/golang/mock/gomock
 # github.com/landoop/schema-registry v0.0.0-20181115093143-9861c67a815b
 github.com/landoop/schema-registry
-# github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-067d4b5
+# github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223083223-c94b322
 github.com/rbock44/okfw-kafka-go/kafka

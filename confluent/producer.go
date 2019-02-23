@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	okfw "github.com/rbock44/okfw-kafka-go/kafka"
 )
 
 //MessageProducer holds the kafka producer and some message counters
@@ -15,7 +16,7 @@ type MessageProducer struct {
 	Topic        string
 	ClientID     string
 	Producer     *kafka.Producer
-	RateLimiter  RateLimiter
+	RateLimiter  *okfw.RateLimiter
 }
 
 func newMessageProducer(topic string, clientID string) (*MessageProducer, error) {
@@ -58,14 +59,8 @@ func newMessageProducer(topic string, clientID string) (*MessageProducer, error)
 	return kp, nil
 }
 
-//RateLimiter limites the producer to send only messages per second or wait
-type RateLimiter interface {
-	Check(now time.Time) time.Duration
-	IncrementMessageCount()
-}
-
 //SetRateLimiter sets the rate limiter to use
-func (kp *MessageProducer) SetRateLimiter(rateLimiter RateLimiter) {
+func (kp *MessageProducer) SetRateLimiter(rateLimiter *okfw.RateLimiter) {
 	kp.RateLimiter = rateLimiter
 }
 
@@ -82,8 +77,7 @@ func (kp *MessageProducer) Close() {
 //SendKeyValue send message with key and value
 func (kp *MessageProducer) SendKeyValue(key []byte, value []byte) error {
 	if kp.RateLimiter != nil {
-		kp.RateLimiter.IncrementMessageCount()
-		idleTime := kp.RateLimiter.Check(time.Now())
+		idleTime := kp.RateLimiter.Check(time.Now(), kp.MessageCount)
 		if idleTime > 0 {
 			time.Sleep(idleTime)
 		}
