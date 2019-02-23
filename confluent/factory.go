@@ -19,13 +19,13 @@ func (p *FrameworkFactory) NewProducer(topic string, clientID string) (kafka.Mes
 	return newMessageProducer(topic, clientID)
 }
 
-//NewRegistry creates a new registry
-func (p *FrameworkFactory) NewRegistry() (kafka.Registry, error) {
+//NewSchemaResolver creates a new registry
+func (p *FrameworkFactory) NewSchemaResolver() (kafka.SchemaResolver, error) {
 	_, err := getKafkaSchemaClient().Subjects()
 	if err != nil {
 		return nil, fmt.Errorf("cannot query subjects on kafka registry [%s]", err.Error())
 	}
-	return kafka.NewSchemaRegistry(), nil
+	return newSchemaResolver(), nil
 }
 
 //NewFrameworkFactory creates the consumer and provider factory
