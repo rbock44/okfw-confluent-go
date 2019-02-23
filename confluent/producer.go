@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	okfw "github.com/rbock44/okfw-kafka-go/kafka"
 )
 
 //MessageProducer holds the kafka producer and some message counters
@@ -16,7 +15,6 @@ type MessageProducer struct {
 	Topic        string
 	ClientID     string
 	Producer     *kafka.Producer
-	RateLimiter  *okfw.RateLimiter
 }
 
 func newMessageProducer(topic string, clientID string) (*MessageProducer, error) {
@@ -59,29 +57,18 @@ func newMessageProducer(topic string, clientID string) (*MessageProducer, error)
 	return kp, nil
 }
 
-//SetRateLimiter sets the rate limiter to use
-func (kp *MessageProducer) SetRateLimiter(rateLimiter *okfw.RateLimiter) {
-	kp.RateLimiter = rateLimiter
-}
-
-//GetRateCounter get the message counter
-func (kp *MessageProducer) GetRateCounter() *int64 {
-	return &kp.MessageCount
-}
-
 //Close the producer
 func (kp *MessageProducer) Close() {
 	kp.Producer.Close()
 }
 
+//GetMessageCounter returns the address to the message counter
+func (kp *MessageProducer) GetMessageCounter() *int64 {
+	return &kp.MessageCount
+}
+
 //SendKeyValue send message with key and value
 func (kp *MessageProducer) SendKeyValue(key []byte, value []byte) error {
-	if kp.RateLimiter != nil {
-		idleTime := kp.RateLimiter.Check(time.Now(), kp.MessageCount)
-		if idleTime > 0 {
-			time.Sleep(idleTime)
-		}
-	}
 	err := kp.Producer.Produce(
 		&kafka.Message{
 			TopicPartition: kafka.TopicPartition{
