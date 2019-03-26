@@ -11,8 +11,8 @@ import (
 type FrameworkFactory struct{}
 
 //NewConsumer creaes a new confluent consumer
-func (p *FrameworkFactory) NewConsumer(topic string, clientID string) (kafka.MessageConsumer, error) {
-	return newMessageConsumer(topic, clientID)
+func (p *FrameworkFactory) NewConsumer(topic string, clientID string, handler kafka.MessageHandler) (kafka.MessageConsumer, error) {
+	return newMessageConsumer(topic, clientID, handler)
 }
 
 //NewProducer creates a new confluent provider

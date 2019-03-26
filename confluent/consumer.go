@@ -19,8 +19,8 @@ type MessageConsumer struct {
 	Handler        okfwkafka.MessageHandler
 }
 
-func newMessageConsumer(topic string, clientID string) (*MessageConsumer, error) {
-	kc := MessageConsumer{Topic: topic, ClientID: clientID}
+func newMessageConsumer(topic string, clientID string, handler okfwkafka.MessageHandler) (*MessageConsumer, error) {
+	kc := MessageConsumer{Topic: topic, ClientID: clientID, Handler: handler}
 
 	var err error
 	kc.Consumer, err = kafka.NewConsumer(
