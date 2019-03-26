@@ -2,9 +2,17 @@ package kafka
 
 import (
 	"io"
+
+	"github.com/rbock44/okfw-log-go/logapi"
 )
 
 var fwFactory Provider
+var logger logapi.Logger
+
+//SetLogger sets the logger implementation
+func SetLogger(logImpl logapi.Logger) {
+	logger = logImpl
+}
 
 //SetFrameworkFactory sets the provider that generates the consumer and producers of the used kafka framework
 func SetFrameworkFactory(provider Provider) {
@@ -40,7 +48,7 @@ type Registry interface {
 
 //MessageConsumer interface to abstract message receiving and make writing tests simpler
 type MessageConsumer interface {
-	ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error
+	Process(pollTimeoutMs int) error
 	GetMessageCounter() *int64
 	GetBacklog() (backlog int, err error)
 	Close()
@@ -64,7 +72,7 @@ type DeliveredCounter interface {
 
 //Provider creates kafa consumer producer based on an implementation
 type Provider interface {
-	NewConsumer(topic string, clientID string) (MessageConsumer, error)
+	NewConsumer(topic string, clientID string, handler MessageHandler) (MessageConsumer, error)
 	NewProducer(topic string, clientID string) (MessageProducer, error)
-	NewSchemaResolver() SchemaResolver
+	NewSchemaResolver() (SchemaResolver, error)
 }

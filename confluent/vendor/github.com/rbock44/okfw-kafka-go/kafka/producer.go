@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"bytes"
-	"fmt"
 	"time"
 )
 
@@ -70,7 +69,7 @@ func (p *SingleProducer) RunRateReporter(intervalMs int) {
 		&p.MessageCount,
 		&p.Shutdown,
 		func(name string, rate float64) {
-			fmt.Printf("report rate [%s] [%4.2f]\n", p.Topic, rate)
+			logger.Infof("report rate [%s] [%4.2f]\n", p.Topic, rate)
 		},
 		intervalMs)
 	if err == nil {

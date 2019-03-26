@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rbock44/okfw-kafka-go/kafka"
+	"github.com/rbock44/okfw-logapi-go/logapi"
 )
 
 //FrameworkFactory creates consumer and provider for the okfw-kafka-go
@@ -29,6 +30,7 @@ func (p *FrameworkFactory) NewSchemaResolver() (kafka.SchemaResolver, error) {
 }
 
 //NewFrameworkFactory creates the consumer and provider factory
-func NewFrameworkFactory() *FrameworkFactory {
+func NewFrameworkFactory(logImpl logapi.Logger) *FrameworkFactory {
+	logger = logImpl
 	return &FrameworkFactory{}
 }

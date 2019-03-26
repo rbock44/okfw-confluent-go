@@ -54,13 +54,16 @@ type SchemaRegistry struct {
 }
 
 //NewSchemaRegistry creates a kafka schema registry
-func NewSchemaRegistry() *SchemaRegistry {
-	schemaResolver := fwFactory.NewSchemaResolver()
+func NewSchemaRegistry() (*SchemaRegistry, error) {
+	schemaResolver, err := fwFactory.NewSchemaResolver()
+	if err != nil {
+		return nil, err
+	}
 	return &SchemaRegistry{
 		Resolver:      schemaResolver,
 		SchemasByID:   map[int]*AvroSchema{},
 		SchemasByName: map[string]*AvroSchema{},
-	}
+	}, nil
 }
 
 //Lookup lookup schema in kafka cluster

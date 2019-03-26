@@ -3,74 +3,52 @@ package kafka
 import (
 	"bytes"
 	"fmt"
+	"time"
 )
 
-//SingleConsumer only supports ReadMessage
-type SingleConsumer struct {
-	Topic    string
-	Consumer MessageConsumer
-	Registry Registry
-	Shutdown bool
+//MessageContext contains time stamp and received message key and value
+type MessageContext struct {
+	Timestamp time.Time
 }
 
-//BulkConsumer supports bulk reads with message handlere and error handler
-type BulkConsumer struct {
-	SingleConsumer *SingleConsumer
-	MessageHandler func(key interface{}, value interface{}, err error)
-	Registry       Registry
-	PollTimeMs     int
-	Shutdown       *bool
+//MessageHandler handles the incoming message
+type MessageHandler interface {
+	Handle(context *MessageContext, key []byte, value []byte)
 }
 
-//NewSingleConsumer creates a SingleConsumer
-func NewSingleConsumer(topic string, clientID string, registry Registry) (*SingleConsumer, error) {
-	consumerImpl, err := fwFactory.NewConsumer(topic, clientID)
+//Consumer consumes messages and passes each message to a handler
+type Consumer struct {
+	Topic      string
+	Consumer   MessageConsumer
+	Handler    MessageHandler
+	Registry   Registry
+	Shutdown   bool
+	PollTimeMs int
+}
+
+//NewConsumer creates a consumer
+func NewConsumer(topic string, clientID string, registry Registry, pollTimeMs int, handler MessageHandler) (*Consumer, error) {
+	if handler == nil {
+		return nil, fmt.Errorf("consumer message handler missing")
+	}
+
+	consumerImpl, err := fwFactory.NewConsumer(topic, clientID, handler)
 	if err != nil {
 		return nil, err
 	}
-	sc := SingleConsumer{
-		Topic:    topic,
-		Consumer: consumerImpl,
-		Registry: registry,
-		Shutdown: false,
-	}
-
-	return &sc, nil
+	return &Consumer{
+		Topic:      topic,
+		Consumer:   consumerImpl,
+		Registry:   registry,
+		Shutdown:   false,
+		PollTimeMs: pollTimeMs,
+	}, nil
 }
 
-//NewBulkConsumer creates a new BulkConsumer
-func NewBulkConsumer(
-	topic string,
-	clientID string,
-	registry Registry,
-	messageHandler func(key interface{}, value interface{}, err error),
-	pollTimeMs int,
-	shutdown *bool) (*BulkConsumer, error) {
-	if messageHandler == nil {
-		return nil, fmt.Errorf("messageHandler is nil")
-	}
-	SingleConsumer, err := NewSingleConsumer(topic, clientID, registry)
-	if err != nil {
-		return nil, err
-	}
-	bulkConsumer := BulkConsumer{
-		MessageHandler: messageHandler,
-		SingleConsumer: SingleConsumer,
-		PollTimeMs:     pollTimeMs,
-		Shutdown:       shutdown,
-	}
-
-	return &bulkConsumer, nil
-}
-
-//ReadMessage read a message and process it
-func (c *SingleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{}, interface{}, error) {
-	keyBuffer := &bytes.Buffer{}
-	valueBuffer := &bytes.Buffer{}
-	err := c.Consumer.ReadMessage(shutdownCheckInterfaceMs, keyBuffer, valueBuffer)
-	if err != nil {
-		return nil, nil, err
-	}
+//ExtractSchema extracts the schema version and decodes the key and value
+func (c *Consumer) ExtractSchema(context *MessageContext, key []byte, value []byte) (interface{}, interface{}, error) {
+	keyBuffer := bytes.NewBuffer(key)
+	valueBuffer := bytes.NewBuffer(value)
 
 	if keyBuffer.Len() == 0 {
 		//no message poll interval expired
@@ -91,7 +69,7 @@ func (c *SingleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{},
 		return nil, nil, fmt.Errorf("no key decoder")
 	}
 
-	key, err := decoder.Decode(keyBuffer)
+	decodedKey, err := decoder.Decode(keyBuffer)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -109,18 +87,18 @@ func (c *SingleConsumer) ReadMessage(shutdownCheckInterfaceMs int) (interface{},
 	if decoder == nil {
 		return key, nil, fmt.Errorf("no value decoder")
 	}
-	value, err := decoder.Decode(valueBuffer)
+	decodedValue, err := decoder.Decode(valueBuffer)
 
-	return key, value, err
+	return decodedKey, decodedValue, err
 }
 
 //RunBacklogReporter runs the back log reporter should be run in a go routine
-func (c *SingleConsumer) RunBacklogReporter(intervalMs int) {
+func (c *Consumer) RunBacklogReporter(intervalMs int) {
 	br, err := NewBacklogReporter(
 		c.Topic,
 		c,
 		func(name string, count int, err error) {
-			fmt.Printf("report backlog [%s] [%d]", name, count)
+			logger.Infof("report backlog [%s] [%d]", name, count)
 		},
 		&c.Shutdown,
 		intervalMs)
@@ -130,13 +108,13 @@ func (c *SingleConsumer) RunBacklogReporter(intervalMs int) {
 }
 
 //RunRateReporter starts rate reporter should be run in a go routine
-func (c *SingleConsumer) RunRateReporter(intervalMs int) {
+func (c *Consumer) RunRateReporter(intervalMs int) {
 	br, err := NewRateReporter(
 		c.Topic,
 		c.Consumer.GetMessageCounter(),
 		&c.Shutdown,
 		func(name string, rate float64) {
-			fmt.Printf("report rate [%s] [%4.2f]\n", name, rate)
+			logger.Infof("report rate [%s] [%4.2f]\n", name, rate)
 		},
 		intervalMs)
 	if err == nil {
@@ -145,58 +123,31 @@ func (c *SingleConsumer) RunRateReporter(intervalMs int) {
 }
 
 //GetRateCounter returns the message counter address to monitor e.g. with the rate limiter
-func (c *SingleConsumer) GetRateCounter() *int64 {
+func (c *Consumer) GetRateCounter() *int64 {
 	return c.Consumer.GetMessageCounter()
 }
 
 //GetBacklog returns the messages left in the topic
-func (c *SingleConsumer) GetBacklog() (int, error) {
+func (c *Consumer) GetBacklog() (int, error) {
 	return c.Consumer.GetBacklog()
 }
 
 //Close closes the underlying consumer implementation
-func (c *SingleConsumer) Close() {
-	c.Consumer.Close()
+func (c *Consumer) Close() {
+	if c.Consumer != nil {
+		logger.Debugf("Consumer->Close\n")
+		c.Consumer.Close()
+	}
 	//stop limiter and reporter
 	c.Shutdown = true
 }
 
 //Process receive messages and dispatch to message handler and error handler until shutdown flag is true
-func (c *BulkConsumer) Process() {
+func (c *Consumer) Process() {
 	for {
-		key, value, err := c.SingleConsumer.ReadMessage(c.PollTimeMs)
-		if err != nil {
-			c.MessageHandler(key, value, err)
-		} else {
-			if key != nil {
-				c.MessageHandler(key, value, err)
-			}
-		}
-
-		if *c.Shutdown {
+		c.Consumer.Process(c.PollTimeMs)
+		if c.Shutdown {
 			return
 		}
-	}
-}
-
-//GetBacklog returns the messages left in the topic
-func (c *BulkConsumer) GetBacklog() (int, error) {
-	return c.SingleConsumer.GetBacklog()
-}
-
-//RunBacklogReporter runs the go routine for the backlog reporter
-func (c *BulkConsumer) RunBacklogReporter(intervalMs int) {
-	c.SingleConsumer.RunBacklogReporter(intervalMs)
-}
-
-//RunRateReporter runs the go routine for the rate reporter
-func (c *BulkConsumer) RunRateReporter(intervalMs int) {
-	c.SingleConsumer.RunRateReporter(intervalMs)
-}
-
-//Close closes the bulk consumer and makes sure the underlying simple consumer is closed
-func (c *BulkConsumer) Close() {
-	if c.SingleConsumer != nil {
-		c.SingleConsumer.Close()
 	}
 }

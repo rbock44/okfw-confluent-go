@@ -1,10 +1,11 @@
 package confluent
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	okfwkafka "github.com/rbock44/okfw-kafka-go/kafka"
 )
 
 //MessageConsumer high level consumer wrapper
@@ -15,6 +16,7 @@ type MessageConsumer struct {
 	FailedCount    int64
 	IgnoredCount   int64
 	DeliveredCount int64
+	Handler        okfwkafka.MessageHandler
 }
 
 func newMessageConsumer(topic string, clientID string) (*MessageConsumer, error) {
@@ -40,14 +42,20 @@ func newMessageConsumer(topic string, clientID string) (*MessageConsumer, error)
 	return &kc, nil
 }
 
-//ReadMessage read an event in case no event is available return nil
-func (kc *MessageConsumer) ReadMessage(timeoutMs int, keyWriter io.Writer, valueWriter io.Writer) error {
+//Process poll the consumer and call the message handler
+func (kc *MessageConsumer) Process(timeoutMs int) error {
 	ev := kc.Consumer.Poll(timeoutMs)
 	switch e := ev.(type) {
 	case *kafka.Message:
 		kc.DeliveredCount++
-		keyWriter.Write(e.Key)
-		valueWriter.Write(e.Value)
+		keyBuffer := &bytes.Buffer{}
+		keyBuffer.Write(e.Key)
+		valueBuffer := &bytes.Buffer{}
+		valueBuffer.Write(e.Value)
+		context := &okfwkafka.MessageContext{
+			Timestamp: e.Timestamp,
+		}
+		kc.Handler.Handle(context, keyBuffer.Bytes(), valueBuffer.Bytes())
 		return nil
 	case kafka.Error:
 		kc.FailedCount++
