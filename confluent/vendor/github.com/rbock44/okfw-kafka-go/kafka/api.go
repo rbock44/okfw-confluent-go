@@ -44,6 +44,7 @@ type Registry interface {
 	Register(name string, version int, schemaFile string, decoder Decoder, encoder Encoder) (MessageSchema, error)
 	GetSchemaByName(name string) (MessageSchema, error)
 	GetSchemaByID(id int) (MessageSchema, error)
+	DecodeMessage(context *MessageContext, key []byte, value []byte) (interface{}, interface{}, error)
 }
 
 //MessageConsumer interface to abstract message receiving and make writing tests simpler

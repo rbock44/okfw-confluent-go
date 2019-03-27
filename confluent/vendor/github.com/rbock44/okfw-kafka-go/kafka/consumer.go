@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 )
@@ -21,13 +20,12 @@ type Consumer struct {
 	Topic      string
 	Consumer   MessageConsumer
 	Handler    MessageHandler
-	Registry   Registry
 	Shutdown   bool
 	PollTimeMs int
 }
 
 //NewConsumer creates a consumer
-func NewConsumer(topic string, clientID string, registry Registry, pollTimeMs int, handler MessageHandler) (*Consumer, error) {
+func NewConsumer(topic string, clientID string, pollTimeMs int, handler MessageHandler) (*Consumer, error) {
 	if handler == nil {
 		return nil, fmt.Errorf("consumer message handler missing")
 	}
@@ -39,57 +37,9 @@ func NewConsumer(topic string, clientID string, registry Registry, pollTimeMs in
 	return &Consumer{
 		Topic:      topic,
 		Consumer:   consumerImpl,
-		Registry:   registry,
 		Shutdown:   false,
 		PollTimeMs: pollTimeMs,
 	}, nil
-}
-
-//ExtractSchema extracts the schema version and decodes the key and value
-func (c *Consumer) ExtractSchema(context *MessageContext, key []byte, value []byte) (interface{}, interface{}, error) {
-	keyBuffer := bytes.NewBuffer(key)
-	valueBuffer := bytes.NewBuffer(value)
-
-	if keyBuffer.Len() == 0 {
-		//no message poll interval expired
-		return nil, nil, nil
-	}
-
-	schemaID, err := readSchemaID(keyBuffer)
-	if err != nil {
-		return nil, nil, err
-	}
-	keySchema, err := c.Registry.GetSchemaByID(int(schemaID))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	decoder := keySchema.GetDecoder()
-	if decoder == nil {
-		return nil, nil, fmt.Errorf("no key decoder")
-	}
-
-	decodedKey, err := decoder.Decode(keyBuffer)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	id, err := readSchemaID(valueBuffer)
-	if err != nil {
-		return nil, nil, err
-	}
-	valueSchema, err := c.Registry.GetSchemaByID(int(id))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	decoder = valueSchema.GetDecoder()
-	if decoder == nil {
-		return key, nil, fmt.Errorf("no value decoder")
-	}
-	decodedValue, err := decoder.Decode(valueBuffer)
-
-	return decodedKey, decodedValue, err
 }
 
 //RunBacklogReporter runs the back log reporter should be run in a go routine

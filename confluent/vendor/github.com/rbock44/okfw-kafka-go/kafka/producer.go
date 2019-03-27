@@ -8,7 +8,6 @@ import (
 //SingleProducer combines a kafka producer with avro schema support
 type SingleProducer struct {
 	Topic        string
-	Registry     Registry
 	producer     MessageProducer
 	rateLimiter  *RateLimiter
 	Shutdown     bool
@@ -16,14 +15,13 @@ type SingleProducer struct {
 }
 
 //NewSingleProducer creates a SingleProducer
-func NewSingleProducer(topic string, clientID string, registry Registry) (*SingleProducer, error) {
+func NewSingleProducer(topic string, clientID string) (*SingleProducer, error) {
 	producer, err := fwFactory.NewProducer(topic, clientID)
 	if err != nil {
 		return nil, err
 	}
 	SingleProducer := SingleProducer{
 		Topic:    topic,
-		Registry: registry,
 		producer: producer,
 		Shutdown: false,
 	}

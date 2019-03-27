@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -130,4 +131,70 @@ func (s SchemaRegistry) Register(subject string, version int, schemaPath string,
 	s.SchemasByID[id] = localSchema
 	s.SchemasByName[subject] = localSchema
 	return localSchema, nil
+}
+
+//DecodeMessage extracts the schema version and decodes the key and value
+func (s SchemaRegistry) DecodeMessage(context *MessageContext, key []byte, value []byte) (interface{}, interface{}, error) {
+	keyBuffer := bytes.NewBuffer(key)
+	valueBuffer := bytes.NewBuffer(value)
+
+	if keyBuffer.Len() == 0 {
+		//no message poll interval expired
+		return nil, nil, nil
+	}
+
+	schemaID, err := readSchemaID(keyBuffer)
+	if err != nil {
+		return nil, nil, err
+	}
+	keySchema, err := s.GetSchemaByID(int(schemaID))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	decoder := keySchema.GetDecoder()
+	if decoder == nil {
+		return nil, nil, fmt.Errorf("no key decoder")
+	}
+
+	decodedKey, err := decoder.Decode(keyBuffer)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	id, err := readSchemaID(valueBuffer)
+	if err != nil {
+		return nil, nil, err
+	}
+	valueSchema, err := s.GetSchemaByID(int(id))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	decoder = valueSchema.GetDecoder()
+	if decoder == nil {
+		return key, nil, fmt.Errorf("no value decoder")
+	}
+	decodedValue, err := decoder.Decode(valueBuffer)
+
+	return decodedKey, decodedValue, err
+}
+
+//readSchemaID of message
+func readSchemaID(reader io.Reader) (uint32, error) {
+	headerBytes := [5]byte{}
+	len, err := reader.Read(headerBytes[:])
+	if err != nil {
+		return 0, fmt.Errorf("error reading header [#%v]", err)
+	}
+	if len != 5 {
+		return 0, fmt.Errorf("header expected [5] but was [%d] bytes", len)
+	}
+
+	if headerBytes[0] != 0 {
+		return 0, fmt.Errorf("header magic byte is not [0] but was [%d]", headerBytes[0])
+	}
+	messageSchemaID := binary.BigEndian.Uint32(headerBytes[1:5])
+
+	return messageSchemaID, nil
 }
