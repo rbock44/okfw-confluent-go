@@ -43,6 +43,8 @@ github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223212330-ae45d4cfbf66 h1:wxF
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190223212330-ae45d4cfbf66/go.mod h1:9w1IsIYl8Tq9GyGqPApLNOwp3KYzJsbM1cPXXvgfwA0=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190326215515-90963b3578ae h1:4fnPO10ZV1CwPV2dTcdkdf5gT69Fzo2VzW3piYhdHBs=
 github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190326215515-90963b3578ae/go.mod h1:ZarvhqX8f0SyCtqjRtmi+MleAYKU2r7C3W/cswj8qUM=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190327071600-3d72723ee110 h1:OVC8c4v5m5yQ45X9bMOVwh7V1bZ+XSNLgWXJCz4j4m0=
+github.com/rbock44/okfw-kafka-go/kafka v0.0.0-20190327071600-3d72723ee110/go.mod h1:ZarvhqX8f0SyCtqjRtmi+MleAYKU2r7C3W/cswj8qUM=
 github.com/rbock44/okfw-log-go v0.0.0-20190326141108-b9175eb2e46e h1:UqsJLpm3Oa3xXmTYSzmA68qAo9a4TI5TrvekfR3rMiQ=
 github.com/rbock44/okfw-log-go v0.0.0-20190326141108-b9175eb2e46e/go.mod h1:bfb0ksWvgZLlhmZq0qf15gmA3gVOqnkX5CREewQWMFM=
 github.com/rbock44/okfw-logapi-go v0.0.0-20190326141108-b9175eb2e46e h1:iclYqn2hBnR7LYYrH3Kcl6rHRmB/bkdbEfNDwdnbU1o=
