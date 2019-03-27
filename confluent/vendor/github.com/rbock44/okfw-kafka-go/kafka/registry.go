@@ -133,7 +133,18 @@ func (s SchemaRegistry) Register(subject string, version int, schemaPath string,
 	return localSchema, nil
 }
 
-//DecodeMessage extracts the schema version and decodes the key and value
+//EncodeMessage encodes the message with the schema
+func (s SchemaRegistry) EncodeMessage(keySchema MessageSchema, key interface{}, valueSchema MessageSchema, value interface{}) ([]byte, []byte) {
+	keyBuffer := &bytes.Buffer{}
+	valueBuffer := &bytes.Buffer{}
+	keySchema.WriteHeader(keyBuffer)
+	valueSchema.WriteHeader(valueBuffer)
+	keySchema.GetEncoder().Encode(key, keyBuffer)
+	valueSchema.GetEncoder().Encode(value, valueBuffer)
+	return keyBuffer.Bytes(), valueBuffer.Bytes()
+}
+
+//DecodeMessage decodes the message with the schema
 func (s SchemaRegistry) DecodeMessage(context *MessageContext, key []byte, value []byte) (interface{}, interface{}, error) {
 	keyBuffer := bytes.NewBuffer(key)
 	valueBuffer := bytes.NewBuffer(value)

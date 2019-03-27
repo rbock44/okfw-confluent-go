@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"bytes"
 	"time"
 )
 
@@ -38,14 +37,8 @@ func (p *SingleProducer) SetRateLimit(limitPerSecond int) {
 }
 
 //SendKeyValue sends a key value pair
-func (p *SingleProducer) SendKeyValue(keySchema MessageSchema, key interface{}, valueSchema MessageSchema, value interface{}) error {
-	keyBuffer := &bytes.Buffer{}
-	valueBuffer := &bytes.Buffer{}
-	keySchema.WriteHeader(keyBuffer)
-	valueSchema.WriteHeader(valueBuffer)
-	keySchema.GetEncoder().Encode(key, keyBuffer)
-	valueSchema.GetEncoder().Encode(value, valueBuffer)
-	err := p.producer.SendKeyValue(keyBuffer.Bytes(), valueBuffer.Bytes())
+func (p *SingleProducer) SendKeyValue(key []byte, value []byte) error {
+	err := p.producer.SendKeyValue(key, value)
 	if err != nil {
 		return err
 	}
