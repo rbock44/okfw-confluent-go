@@ -6,3 +6,8 @@ import (
 
 //Logger logger implementation
 var logger logapi.Logger
+
+//SetLogger sets the logger implementation
+func SetLogger(logImpl logapi.Logger) {
+	logger = logImpl
+}
